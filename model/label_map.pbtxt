@@ -1,0 +1,54 @@
+item {
+  id: 1
+  name: 'person'
+}
+
+item {
+  id: 2
+  name: 'car'
+}
+
+item {
+  id: 3
+  name: 'bus'
+}
+
+item {
+  id: 4
+  name: 'truck'
+}
+
+item {
+  id: 5
+  name: 'moto-bike'
+}
+
+item {
+  id: 6
+  name: 'boat'
+}
+
+item {
+  id: 7
+  name: 'weapon'
+}
+
+item {
+  id: 8
+  name: 'helicopter-plane'
+}
+
+item {
+  id: 9
+  name: 'ship'
+}
+
+item {
+  id: 10
+  name: 'mil_vehicle'
+}
+
+item {
+  id: 11
+  name: 'UAV'
+}
