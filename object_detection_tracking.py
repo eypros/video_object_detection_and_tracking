@@ -35,8 +35,10 @@ def get_arguments():
     parser.add_argument("--score-threshold", type=float, default=SCORE_THRESHOLD,
                         help="The score above which bboxes are taken into consideration. "
                              "Default: {}".format(SCORE_THRESHOLD))
-    parser.add_argument('-v', "--video-path", type=str,
+    parser.add_argument('-v', "--video-input-path", type=str,
                         help="The path to the video to be processed.")
+    parser.add_argument("--video-output-path", type=str,
+                        help="Where to write the output video .")
     parser.add_argument('-m', "--model-path", type=str, default=MODEL_PATH,
                         help="Path to the frozen model to be used.")
     parser.add_argument('-l', "--labels-map-path", type=str, default=LABELS_MAP_PATH,
@@ -83,10 +85,11 @@ def main():
         raise ImportError('Please upgrade your tensorflow installation to v1.4.* or later!')
 
     args = get_arguments()
-    video_path = args.video_path
-    if not video_path:
-        raise ValueError('Parameter --video-path is required for the module to run. '
+    video_input_path = args.video_input_path
+    if not video_input_path:
+        raise ValueError('Parameter --video-input-path is required for the module to run. '
                          'Please provide a path to a video to be processed!')
+    video_output_path = args.video_output_path
     score_threshold = args.score_threshold
     model_path = args.model_path
     labels_map_path = args.labels_map_path
@@ -109,7 +112,7 @@ def main():
     config = tf.ConfigProto()
     config.gpu_options.allow_growth = True
 
-    video_in, video_out = prepare_video_reader_writer(video_path)
+    video_in, video_out = prepare_video_reader_writer(video_input_path, video_output_path)
     categories = lu.get_labels(labels_map_path)
 
     with detection_graph.as_default():
@@ -144,7 +147,7 @@ def main():
                         feed_dict={image_tensor: image_np_expanded})
                     boxes_det, scores, labels = filter_detections(boxes_det, scores, labels, image, score_threshold)
                     labels = [categories[x] for x in list(labels)]
-                    title = '{} - Frame {} - detection'.format(os.path.basename(video_path), fr)
+                    title = '{} - Frame {} - detection'.format(os.path.basename(video_input_path), fr)
                     write_on = lu.display_bboxes_on_image_array_label(write_on, boxes_det, labels=labels, plot=visualize, title=title)
                     fr += 1
                     frames_from_detection = detection_rate - 1
@@ -172,7 +175,7 @@ def main():
                     boxes_tr[:, 2] = boxes_tr[:, 0] + boxes_tr[:, 2]
                     boxes_tr[:, 3] = boxes_tr[:, 1] + boxes_tr[:, 3]
 
-                    title = '{} - Frame {} - tracking'.format(os.path.basename(video_path), fr)
+                    title = '{} - Frame {} - tracking'.format(os.path.basename(video_input_path), fr)
                     write_on = lu.display_bboxes_on_image_array_label(write_on, boxes_tr, labels=labels,
                                                                       plot=visualize, title=title)
 
